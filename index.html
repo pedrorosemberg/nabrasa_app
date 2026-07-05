@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Na Brasa — Calculadora de Churrasco</title>
+<style>
+  :root{
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --border: #E6E3DD;
+    --text: #1C1C1E;
+    --text-secondary: #6E6E73;
+    --text-tertiary: #A4A2A0;
+    --accent: #D2461B;
+    --accent-dark: #A83614;
+    --accent-soft: #FBEAE2;
+    --green: #45604A;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 1px 2px rgba(28,28,30,0.04), 0 8px 24px rgba(28,28,30,0.05);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position: relative;
+    padding: 72px 24px 56px;
+    text-align: center;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(28,28,30,0.035) 0px,
+        rgba(28,28,30,0.035) 1px,
+        transparent 1px,
+        transparent 22px
+      );
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero .eyebrow{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    background: var(--accent-soft);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+
+  .hero .eyebrow .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .hero h1{
+    font-size: clamp(36px, 6vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 14px;
+  }
+
+  .hero h1 em{
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p{
+    max-width: 480px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+    font-size: 17px;
+  }
+
+  /* ---------- Sections / cards ---------- */
+  section.card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .step-label{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .step-num{
+    width: 26px; height: 26px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--text);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .step-title{
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .step-sub{
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: -14px 0 22px 36px;
+  }
+
+  /* ---------- People inputs ---------- */
+  .people-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .field label{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .field input[type="number"]{
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 20px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--text);
+    -moz-appearance: textfield;
+  }
+
+  .field input[type="number"]:focus{
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .field span.hint{
+    display: block;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+
+  /* appetite selector */
+  .appetite-row{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .appetite-opt{
+    position: relative;
+  }
+  .appetite-opt input{
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .appetite-opt .box{
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 12px;
+    text-align: center;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .appetite-opt .box .n{
+    display:block;
+    font-weight: 650;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  .appetite-opt .box .g{
+    display:block;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .appetite-opt input:checked + .box{
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .appetite-opt input:focus-visible + .box{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .note{
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--text-tertiary);
+    line-height: 1.55;
+  }
+
+  /* ---------- Category groups (meat) ---------- */
+  .category{
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .category:last-child{ margin-bottom: 0; }
+
+  .category summary{
+    list-style: none;
+    cursor: pointer;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--bg);
+  }
+  .category summary::-webkit-details-marker{ display: none; }
+  .category summary .chev{
+    color: var(--text-tertiary);
+    transition: transform .18s ease;
+    font-size: 13px;
+  }
+  .category[open] summary .chev{ transform: rotate(90deg); }
+
+  .category .cuts{
+    padding: 8px 18px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+  }
+
+  .cut-item{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14.5px;
+    cursor: pointer;
+  }
+  .cut-item input{
+    accent-color: var(--accent);
+    width: 17px; height: 17px;
+    cursor: pointer;
+  }
+
+  /* ---------- Simple checklist rows (drinks/sides) ---------- */
+  .list-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+  }
+  .list-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14.5px;
+    cursor: pointer;
+  }
+  .list-item .left{
+    display: flex; align-items: center; gap: 10px;
+  }
+  .list-item input{
+    accent-color: var(--accent);
+    width: 17px; height: 17px;
+    cursor: pointer;
+  }
+  .list-item .rate{
+    font-size: 12px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+
+  /* ---------- Custom items ---------- */
+  #customRows{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .custom-row{
+    display: grid;
+    grid-template-columns: 1.6fr 0.7fr 0.7fr 32px;
+    gap: 8px;
+  }
+  .custom-row input{
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    background: var(--bg);
+    width: 100%;
+  }
+  .custom-row input:focus{
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+  }
+  .custom-row button{
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+  }
+  .custom-row button:hover{ color: var(--accent-dark); background: var(--accent-soft); }
+
+  .add-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1.5px dashed var(--border);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .add-btn:hover{ border-color: var(--accent); color: var(--accent-dark); }
+
+  /* ---------- Calculate button ---------- */
+  .calc-bar{
+    text-align: center;
+    margin: 32px 0 8px;
+  }
+  #calcBtn{
+    background: var(--text);
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: 650;
+    padding: 17px 40px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+  #calcBtn:hover{ background: var(--accent-dark); }
+  #calcBtn:active{ transform: scale(0.98); }
+  #errMsg{
+    color: var(--accent-dark);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ---------- Results ---------- */
+  #results{ display: none; }
+
+  .results-hero{
+    text-align: center;
+    padding: 8px 0 28px;
+  }
+  .results-hero .k{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+  .results-hero h2{
+    font-size: clamp(30px, 5vw, 40px);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  .results-hero h2 span{ color: var(--accent); }
+
+  .gauge{
+    max-width: 420px;
+    margin: 22px auto 0;
+  }
+  .gauge-track{
+    height: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .gauge-fill{
+    height: 100%;
+    background: linear-gradient(90deg, #F2A54E, var(--accent) 55%, var(--accent-dark));
+    border-radius: 999px;
+    transition: width .5s ease;
+  }
+  .gauge-caption{
+    display:flex; justify-content: space-between;
+    font-size: 11.5px; color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+
+  .stat-grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .stat{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 14px;
+    text-align: center;
+  }
+  .stat .v{ font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+  .stat .l{ font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; }
+
+  .result-section{ margin-top: 8px; }
+  .result-section h3{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 28px 0 12px;
+  }
+  .result-row{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  .result-row:last-child{ border-bottom: none; }
+  .result-row .name{ font-weight: 500; }
+  .result-row .amount{ font-weight: 700; font-variant-numeric: tabular-nums; }
+  .result-row .amount small{ font-weight: 500; color: var(--text-secondary); font-size: 12.5px; margin-left: 3px;}
+
+  .actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .actions button{
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .actions button.primary{
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+  .actions button.primary:hover{ background: var(--accent-dark); border-color: var(--accent-dark); }
+  .actions button:not(.primary):hover{ border-color: var(--text-tertiary); }
+  .copied{
+    text-align:center;
+    font-size: 12.5px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+  }
+
+  footer{
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 12.5px;
+    padding: 40px 24px;
+  }
+
+  @media (max-width: 560px){
+    .hero{ padding: 56px 20px 40px; }
+    section.card{ padding: 22px; }
+    .people-grid{ grid-template-columns: 1fr; }
+    .category .cuts{ grid-template-columns: 1fr; }
+    .list-grid{ grid-template-columns: 1fr; }
+    .appetite-row{ grid-template-columns: 1fr; }
+    .stat-grid{ grid-template-columns: 1fr 1fr; }
+    .custom-row{ grid-template-columns: 1fr 1fr; }
+    .custom-row button{ grid-column: span 2; }
+    .actions{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="eyebrow"><span class="dot"></span>Calculadora de churrasco</span>
+  <h1>Quanto comprar para o <em>churrasco</em>?</h1>
+  <p>Informe quem vai comer, escolha as carnes e bebidas, e receba a lista exata de quantidades — sem sobrar e sem faltar.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- STEP 1: Pessoas -->
+  <section class="card">
+    <div class="step-label">
+      <span class="step-num">1</span>
+      <span class="step-title">Quem vem para o churrasco</span>
+    </div>
+    <div class="people-grid">
+      <div class="field">
+        <label for="adults">Adultos</label>
+        <input type="number" id="adults" min="0" value="10">
+        <span class="hint">A partir de 13 anos</span>
+      </div>
+      <div class="field">
+        <label for="children">Crianças</label>
+        <input type="number" id="children" min="0" value="0">
+        <span class="hint">Consomem ~50% da porção adulta</span>
+      </div>
+    </div>
+
+    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">
+      Nível de apetite do grupo
+    </label>
+    <div class="appetite-row">
+      <label class="appetite-opt">
+        <input type="radio" name="appetite" value="leve">
+        <span class="box"><span class="n">Leve</span><span class="g">~350g carne/pessoa</span></span>
+      </label>
+      <label class="appetite-opt">
+        <input type="radio" name="appetite" value="moderado" checked>
+        <span class="box"><span class="n">Moderado</span><span class="g">~450g carne/pessoa</span></span>
+      </label>
+      <label class="appetite-opt">
+        <input type="radio" name="appetite" value="robusto">
+        <span class="box"><span class="n">Churrasco raiz</span><span class="g">~600g carne/pessoa</span></span>
+      </label>
+    </div>
+    <p class="note">
+      As faixas seguem a referência prática usada por açougues e casas de eventos no Brasil (300–600g de carne por adulto,
+      dependendo do perfil do grupo e da quantidade de acompanhamentos), aproximando-se da recomendação nutricional de
+      ingestão proteica por refeição principal. É uma estimativa de planejamento, não uma recomendação nutricional individual.
+    </p>
+  </section>
+
+  <!-- STEP 2: Carnes -->
+  <section class="card">
+    <div class="step-label">
+      <span class="step-num">2</span>
+      <span class="step-title">Escolha os cortes</span>
+    </div>
+    <p class="step-sub">O total de carne calculado no passo 1 é dividido igualmente entre os cortes marcados.</p>
+
+    <details class="category" open>
+      <summary>Boi <span class="chev">›</span></summary>
+      <div class="cuts">
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Picanha" checked>Picanha</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Alcatra" checked>Alcatra</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Costela bovina">Costela bovina</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Fraldinha">Fraldinha</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Maminha">Maminha</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Linguiça de boi" checked>Linguiça de boi</label>
+      </div>
+    </details>
+
+    <details class="category">
+      <summary>Porco <span class="chev">›</span></summary>
+      <div class="cuts">
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Costelinha suína">Costelinha suína</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Linguiça de porco">Linguiça de porco</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Pernil">Pernil</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Panceta">Panceta</label>
+      </div>
+    </details>
+
+    <details class="category">
+      <summary>Frango <span class="chev">›</span></summary>
+      <div class="cuts">
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Coxa e sobrecoxa" checked>Coxa e sobrecoxa</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Coração de galinha">Coração de galinha</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Filé de frango">Filé de frango</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Asa de frango">Asa de frango</label>
+      </div>
+    </details>
+
+    <details class="category">
+      <summary>Peixe <span class="chev">›</span></summary>
+      <div class="cuts">
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Filé de peixe">Filé de peixe</label>
+        <label class="cut-item"><input type="checkbox" class="meat-cut" value="Camarão">Camarão</label>
+      </div>
+    </details>
+  </section>
+
+  <!-- STEP 3: Bebidas -->
+  <section class="card">
+    <div class="step-label">
+      <span class="step-num">3</span>
+      <span class="step-title">Bebidas</span>
+    </div>
+    <div class="list-grid">
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="drink" data-rate="1.0" data-label="Cerveja" checked>Cerveja</span>
+        <span class="rate">1,0 L/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="drink" data-rate="0.5" data-label="Refrigerante" checked>Refrigerante</span>
+        <span class="rate">0,5 L/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="drink" data-rate="0.3" data-label="Água" checked>Água</span>
+        <span class="rate">0,3 L/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="drink" data-rate="0.3" data-label="Suco">Suco</span>
+        <span class="rate">0,3 L/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" id="ice" checked>Gelo</span>
+        <span class="rate">1 kg/pessoa</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- STEP 4: Acompanhamentos -->
+  <section class="card">
+    <div class="step-label">
+      <span class="step-num">4</span>
+      <span class="step-title">Acompanhamentos</span>
+    </div>
+    <div class="list-grid">
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="side" data-rate="0.08" data-unit="kg" data-label="Arroz" checked>Arroz</span>
+        <span class="rate">80 g/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="side" data-rate="0.06" data-unit="kg" data-label="Vinagrete" checked>Vinagrete</span>
+        <span class="rate">60 g/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="side" data-rate="1.5" data-unit="un" data-label="Pão de alho" checked>Pão de alho</span>
+        <span class="rate">1,5 un/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="side" data-rate="0.05" data-unit="kg" data-label="Farofa" checked>Farofa</span>
+        <span class="rate">50 g/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" class="side" data-rate="0.08" data-unit="kg" data-label="Maionese/salada de batata">Maionese/salada de batata</span>
+        <span class="rate">80 g/pessoa</span>
+      </label>
+      <label class="list-item">
+        <span class="left"><input type="checkbox" id="coal" checked>Carvão</span>
+        <span class="rate">~50% do peso da carne</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- STEP 5: Itens personalizados -->
+  <section class="card">
+    <div class="step-label">
+      <span class="step-num">5</span>
+      <span class="step-title">Outros itens</span>
+    </div>
+    <p class="step-sub">Adicione qualquer item extra e a quantidade por pessoa.</p>
+
+    <div id="customRows"></div>
+    <button type="button" class="add-btn" id="addCustom">+ Adicionar item</button>
+  </section>
+
+  <div class="calc-bar">
+    <button id="calcBtn">Calcular quantidades</button>
+    <div id="errMsg">Informe ao menos 1 pessoa e selecione pelo menos um corte de carne.</div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="results">
+    <div class="results-hero">
+      <div class="k">Resultado para <span id="resPeople"></span></div>
+      <h2><span id="resTotalMeat"></span> kg de carne</h2>
+      <div class="gauge">
+        <div class="gauge-track"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+        <div class="gauge-caption"><span>0 kg</span><span id="gaugeMax">30 kg</span></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="v" id="statMeat">–</div><div class="l">Carne total</div></div>
+      <div class="stat"><div class="v" id="statDrink">–</div><div class="l">Bebida total</div></div>
+      <div class="stat"><div class="v" id="statCoal">–</div><div class="l">Carvão</div></div>
+      <div class="stat"><div class="v" id="statIce">–</div><div class="l">Gelo</div></div>
+    </div>
+
+    <section class="card result-section" id="meatResults">
+      <h3>Carnes</h3>
+      <div id="meatRows"></div>
+    </section>
+
+    <section class="card result-section" id="drinkResults">
+      <h3>Bebidas</h3>
+      <div id="drinkRows"></div>
+    </section>
+
+    <section class="card result-section" id="sideResults">
+      <h3>Acompanhamentos</h3>
+      <div id="sideRows"></div>
+    </section>
+
+    <section class="card result-section" id="customResults" style="display:none;">
+      <h3>Outros itens</h3>
+      <div id="customResultRows"></div>
+    </section>
+
+    <div class="actions">
+      <button class="primary" id="copyBtn">Copiar lista</button>
+      <button id="printBtn">Imprimir</button>
+    </div>
+    <div class="copied" id="copiedMsg">Lista copiada ✓</div>
+  </div>
+
+</div>
+
+<footer>Na Brasa — estimativas de planejamento para churrasco. Ajuste conforme o perfil real do seu grupo.</footer>
+
+<script>
+  // ---------- Custom items ----------
+  const customRows = document.getElementById('customRows');
+
+  function addCustomRow(){
+    const row = document.createElement('div');
+    row.className = 'custom-row';
+    row.innerHTML = `
+      <input type="text" class="c-name" placeholder="Nome do item (ex: Queijo coalho)">
+      <input type="number" class="c-qty" placeholder="Qtd/pessoa" step="0.01" min="0">
+      <input type="text" class="c-unit" placeholder="Unidade (kg, un, L)">
+      <button type="button" title="Remover">×</button>
+    `;
+    row.querySelector('button').addEventListener('click', () => row.remove());
+    customRows.appendChild(row);
+  }
+  document.getElementById('addCustom').addEventListener('click', addCustomRow);
+  addCustomRow(); // start with one empty row for convenience
+
+  // ---------- Helpers ----------
+  function fmt(n, decimals){
+    return n.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+
+  function buildRow(name, amount, unit){
+    return `<div class="result-row"><span class="name">${name}</span><span class="amount">${amount} <small>${unit}</small></span></div>`;
+  }
+
+  // ---------- Calculate ----------
+  document.getElementById('calcBtn').addEventListener('click', () => {
+    const adults = parseFloat(document.getElementById('adults').value) || 0;
+    const children = parseFloat(document.getElementById('children').value) || 0;
+    const peopleEq = adults + children * 0.5;
+
+    const meatCuts = Array.from(document.querySelectorAll('.meat-cut:checked'));
+    const errMsg = document.getElementById('errMsg');
+
+    if(peopleEq <= 0 || meatCuts.length === 0){
+      errMsg.style.display = 'block';
+      return;
+    }
+    errMsg.style.display = 'none';
+
+    const appetite = document.querySelector('input[name="appetite"]:checked').value;
+    const meatPerPersonG = { leve: 350, moderado: 450, robusto: 600 }[appetite];
+    const totalMeatG = meatPerPersonG * peopleEq;
+    const totalMeatKg = totalMeatG / 1000;
+    const perCutKg = totalMeatKg / meatCuts.length;
+
+    // Meat rows
+    const meatRows = document.getElementById('meatRows');
+    meatRows.innerHTML = meatCuts.map(cut => buildRow(cut.value, fmt(perCutKg, 2), 'kg')).join('');
+
+    // Drinks
+    const drinks = Array.from(document.querySelectorAll('.drink:checked'));
+    let totalDrinkL = 0;
+    const drinkRows = document.getElementById('drinkRows');
+    let drinkHtml = drinks.map(d => {
+      const liters = parseFloat(d.dataset.rate) * peopleEq;
+      totalDrinkL += liters;
+      return buildRow(d.dataset.label, fmt(liters, 1), 'L');
+    }).join('');
+
+    const iceChecked = document.getElementById('ice').checked;
+    let iceKg = 0;
+    if(iceChecked){
+      iceKg = 1 * peopleEq;
+      drinkHtml += buildRow('Gelo', fmt(iceKg, 1), 'kg');
+    }
+    drinkRows.innerHTML = drinkHtml || '<div class="result-row"><span class="name">Nenhuma bebida selecionada</span></div>';
+
+    // Sides
+    const sides = Array.from(document.querySelectorAll('.side:checked'));
+    const sideRows = document.getElementById('sideRows');
+    let sideHtml = sides.map(s => {
+      const rate = parseFloat(s.dataset.rate);
+      const total = rate * peopleEq;
+      return buildRow(s.dataset.label, fmt(total, s.dataset.unit === 'un' ? 0 : 2), s.dataset.unit);
+    }).join('');
+
+    const coalChecked = document.getElementById('coal').checked;
+    let coalKg = 0;
+    if(coalChecked){
+      coalKg = totalMeatKg * 0.5;
+      sideHtml += buildRow('Carvão', fmt(coalKg, 1), 'kg');
+    }
+    sideRows.innerHTML = sideHtml || '<div class="result-row"><span class="name">Nenhum acompanhamento selecionado</span></div>';
+
+    // Custom items
+    const customResultRows = document.getElementById('customResultRows');
+    const customSection = document.getElementById('customResults');
+    const rows = Array.from(document.querySelectorAll('.custom-row'));
+    const customData = rows.map(r => {
+      const name = r.querySelector('.c-name').value.trim();
+      const qty = parseFloat(r.querySelector('.c-qty').value);
+      const unit = r.querySelector('.c-unit').value.trim() || 'un';
+      if(!name || !qty) return null;
+      return { name, total: qty * peopleEq, unit };
+    }).filter(Boolean);
+
+    if(customData.length){
+      customSection.style.display = 'block';
+      customResultRows.innerHTML = customData.map(c => buildRow(c.name, fmt(c.total, 2), c.unit)).join('');
+    } else {
+      customSection.style.display = 'none';
+    }
+
+    // Header stats
+    document.getElementById('resPeople').textContent =
+      children > 0 ? `${adults} adultos + ${children} crianças` : `${adults} pessoas`;
+    document.getElementById('resTotalMeat').textContent = fmt(totalMeatKg, 1);
+    document.getElementById('statMeat').textContent = fmt(totalMeatKg, 1) + ' kg';
+    document.getElementById('statDrink').textContent = fmt(totalDrinkL, 1) + ' L';
+    document.getElementById('statCoal').textContent = coalChecked ? fmt(coalKg, 1) + ' kg' : '—';
+    document.getElementById('statIce').textContent = iceChecked ? fmt(iceKg, 1) + ' kg' : '—';
+
+    // Gauge (scale caps at a sensible max, minimum 10kg range)
+    const gaugeMax = Math.max(10, Math.ceil(totalMeatKg / 5) * 5 + 5);
+    document.getElementById('gaugeMax').textContent = gaugeMax + ' kg';
+    document.getElementById('gaugeFill').style.width = Math.min(100, (totalMeatKg / gaugeMax) * 100) + '%';
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('copiedMsg').style.display = 'none';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ---------- Copy / Print ----------
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const sections = ['meatRows', 'drinkRows', 'sideRows', 'customResultRows'];
+    const titles = { meatRows: 'CARNES', drinkRows: 'BEBIDAS', sideRows: 'ACOMPANHAMENTOS', customResultRows: 'OUTROS ITENS' };
+    let text = `LISTA DE COMPRAS — CHURRASCO\n${document.getElementById('resPeople').textContent}\n\n`;
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if(id === 'customResultRows' && document.getElementById('customResults').style.display === 'none') return;
+      const rows = Array.from(el.querySelectorAll('.result-row'));
+      if(!rows.length) return;
+      text += `${titles[id]}\n`;
+      rows.forEach(r => {
+        const name = r.querySelector('.name').textContent;
+        const amount = r.querySelector('.amount').textContent.replace(/\s+/g, ' ').trim();
+        text += `- ${name}: ${amount}\n`;
+      });
+      text += '\n';
+    });
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      const msg = document.getElementById('copiedMsg');
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 2500);
+    });
+  });
+
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+</script>
+
+</body>
+</html>
