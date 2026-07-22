@@ -50,6 +50,10 @@
 <meta name="metadax_co" content="metadax.co">
 <meta name="metadax_cloud" content="metadax.cloud">
 
+<!-- Cor de chrome do navegador mobile (Android/iOS PWA) — Azul METADAX, o
+     mesmo token --metadax-blue já usado em toda a marca. Estava faltando. -->
+<meta name="theme-color" content="#0056B3">
+
 <link rel="icon" type="image/x-icon" href="https://cdn.metadax.com.br/favicon.ico">
 
 <!-- Inter é a fonte oficial da METADAX para toda a UI (Audiowide fica restrito ao logotipo, entregue pelo header component). -->
@@ -77,11 +81,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <style>
   :root{
-    /* ---- METADAX design tokens ---- */
-    --md-black: #1E1E1E;      /* Preto METADAX */
-    --md-white: #FFFFFF;      /* Branco Gelo */
-    --md-pure-black: #000000; /* Preto Puro */
-    --md-blue: #0056B3;       /* Azul METADAX — único sinal interativo */
+    /* ---- METADAX design tokens ----
+       Agora apontam para as custom properties já publicadas no
+       global.css (--metadax-black/white/blue) em vez de redeclarar os
+       mesmos valores em hexadecimal — uma única fonte de verdade para a
+       cor de marca. O fallback hex só entra em ação se, por algum motivo,
+       o styles.css não tiver carregado ainda. */
+    --md-black: var(--metadax-black, #1E1E1E);      /* Preto METADAX */
+    --md-white: var(--metadax-white, #FFFFFF);      /* Branco Gelo */
+    --md-pure-black: var(--metadax-pure-black, #000000); /* Preto Puro */
+    --md-blue: var(--metadax-blue, #0056B3);       /* Azul METADAX — único sinal interativo */
     --md-hairline: rgba(0,0,0,0.08);
     --ink-80: rgba(0,0,0,0.8);
     --ink-48: rgba(0,0,0,0.48);
@@ -830,9 +839,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   });
 </script>
 <script src="https://cdn.metadax.com.br/component-loader.js"></script>
+<script src="https://cdn.metadax.com.br/components/scripts/whatsapp-button.js"></script>
 
-<!-- Header institucional METADAX (injetado via component-loader.js) -->
-<div id="metadax-header" data-component-src="https://cdn.metadax.com.br/components/html/header.html"></div>
+<!--
+  Header/footer institucionais (header.html / footer.html) NÃO precisam de
+  um contêiner âncora aqui: o component-loader.js atual injeta o HTML
+  diretamente via insertAdjacentHTML('afterbegin'/'beforeend', ...) no
+  <body>. Os antigos <div data-component-src="..."> foram removidos porque
+  ficavam vazios e duplicados (o loader novo nunca lê esse atributo).
+-->
 
 <!-- Meta Pixel Code -->
 <script>
@@ -1119,9 +1134,6 @@ src="https://www.facebook.com/tr?id=2314887192357729&ev=PageView&noscript=1"
   </div>
 
 </main>
-
-<!-- Footer institucional METADAX (injetado via component-loader.js) -->
-<div id="metadax-footer" data-component-src="https://cdn.metadax.com.br/components/html/footer.html"></div>
 
 <script>
   // ============================================================
